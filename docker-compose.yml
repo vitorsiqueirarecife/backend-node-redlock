@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+  app1:
+    build: .
+    container_name: node-app-0
+    env_file: .env
+    environment:
+      - PORT=3000
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    restart: always
+    ports:
+      - "3000:3000"
+
+  app2:
+    build: .
+    container_name: node-app-1
+    env_file: .env
+    environment:
+      - PORT=3001
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    restart: always
+    ports:
+      - "3001:3001"
+
+  app3:
+    build: .
+    container_name: node-app-2
+    env_file: .env
+    environment:
+      - PORT=3002
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    restart: always
+    ports:
+      - "3002:3002"

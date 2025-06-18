@@ -1,23 +1,35 @@
+const { setLastPolled } = require("../lib/leader.state");
+const { port } = require("../utils/port");
+
 let isLeader = false;
-let lastPolled = null;
+let lastPollSlot = null;
+const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL) ?? 5000;
+
+function onLeadershipChange(state) {
+  isLeader = state;
+  if (!state) {
+    lastPollSlot = null;
+  } else {
+    const now = Date.now();
+    lastPollSlot = Math.floor(now / POLL_INTERVAL);
+  }
+}
 
 const startPollingTask = () => {
   setInterval(() => {
     if (!isLeader) return;
-    // TODO: Mock third-party poll
-    lastPolled = new Date().toISOString();
-    console.log(`[${process.pid}] 📡 Polling API at ${lastPolled}`);
-  }, 5000);
+    const now = Date.now();
+    const pollSlot = Math.floor(now / POLL_INTERVAL);
+    if (pollSlot !== lastPollSlot) {
+      lastPollSlot = pollSlot;
+      const pollTime = new Date().toISOString();
+      setLastPolled(pollTime);
+      console.log(`[${port}] Polling ----> API at ${pollTime}`);
+    }
+  }, 250);
 };
-
-const setLeadership = (state) => {
-  isLeader = state;
-};
-
-const getLastPolled = () => lastPolled;
 
 module.exports = {
   startPollingTask,
-  setLeadership,
-  getLastPolled
+  onLeadershipChange,
 };

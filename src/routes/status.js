@@ -1,10 +1,9 @@
-const express = require('express');
+const express = require("express");
+const { getLeadershipStatus } = require("../lib/leader.state");
 const router = express.Router();
-const { getLeadershipStatus } = require('../lib/leader');
 
-router.get('/', (req, res) => {
-  const status = getLeadershipStatus();
-  res.json(status);
+router.get("/", (_, res) => {
+  res.json(getLeadershipStatus());
 });
 
 module.exports = router;

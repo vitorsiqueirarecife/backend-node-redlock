@@ -1,10 +1,11 @@
+// STATE to API
 let isLeader = false;
 let lastPolled = null;
-let leadershipChangeCb = null;
+let changeCb = null;
 
 function setLeadership(state) {
   isLeader = state;
-  if (leadershipChangeCb) leadershipChangeCb(state);
+  if (changeCb) changeCb(state);
 }
 
 function setLastPolled(dateStr) {
@@ -18,13 +19,18 @@ function getLeadershipStatus() {
   };
 }
 
-function setLeadershipChangeCallback(cb) {
-  leadershipChangeCb = cb;
+function setChangeCallback(cb) {
+  changeCb = cb;
+}
+
+function isLeaderNow() {
+  return isLeader;
 }
 
 module.exports = {
   setLeadership,
   setLastPolled,
   getLeadershipStatus,
-  setLeadershipChangeCallback,
+  setChangeCallback,
+  isLeaderNow,
 };

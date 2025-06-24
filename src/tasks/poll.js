@@ -1,12 +1,11 @@
-const { setLastPolled } = require("../lib/leader.state");
+const { setLastPolled, isLeaderNow } = require("../lib/leader.state");
 const { port } = require("../utils/port");
 
-let isLeader = false;
+// STATE do poll
 let lastPollSlot = null;
 const POLL_INTERVAL = parseInt(process.env.POLL_INTERVAL) ?? 5000;
 
-function onLeadershipChange(state) {
-  isLeader = state;
+function onChangePollSlot(state) {
   if (!state) {
     lastPollSlot = null;
   } else {
@@ -15,9 +14,9 @@ function onLeadershipChange(state) {
   }
 }
 
-const startPollingTask = () => {
+const startPolling = () => {
   setInterval(() => {
-    if (!isLeader) return;
+    if (!isLeaderNow()) return;
     const now = Date.now();
     const pollSlot = Math.floor(now / POLL_INTERVAL);
     if (pollSlot !== lastPollSlot) {
@@ -30,6 +29,6 @@ const startPollingTask = () => {
 };
 
 module.exports = {
-  startPollingTask,
-  onLeadershipChange,
+  startPolling,
+  onChangePollSlot,
 };

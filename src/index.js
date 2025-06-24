@@ -1,8 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const statusRoute = require("./routes/status");
-const { startPollingTask, onLeadershipChange } = require("./tasks/poll");
-const { initLeaderElection } = require("./lib/leader");
+const { startPolling, onChangePollSlot } = require("./tasks/poll");
+const { initElection } = require("./lib/leader.service");
 const { port } = require("./utils/port");
 
 const app = express();
@@ -11,6 +11,7 @@ app.use("/status", statusRoute);
 
 app.listen(port, async () => {
   console.log(`Running on port ${port}`);
-  await initLeaderElection(onLeadershipChange);
-  startPollingTask();
+  // two ways. election and polling
+  await initElection(onChangePollSlot);
+  startPolling();
 });

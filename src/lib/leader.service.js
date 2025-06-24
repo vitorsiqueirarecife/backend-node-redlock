@@ -1,11 +1,11 @@
 const redlock = require("./redlock");
 const redis = require("./redis");
 
-const {
-  setLeadership,
-  setLeadershipChangeCallback,
-} = require("./leader.state");
+const { setLeadership, setChangeCallback } = require("./leader.state");
+
 const { port } = require("../utils/port");
+
+// Handler change states
 
 const LOCK_KEY = process.env.REDIS_LOCK_KEY;
 const LOCK_TTL = parseInt(process.env.REDIS_LOCK_TTL ?? 5000);
@@ -22,17 +22,6 @@ function loseLeadership(reason) {
   console.warn(`[${port}] lost leadership: ${reason}`);
 }
 
-async function tryToBecomeLeader() {
-  try {
-    lock = await redlock.acquire([LOCK_KEY], LOCK_TTL);
-    await becomeLeader();
-    maintainLeadership();
-  } catch (err) {
-    loseLeadership("lock not acquired");
-    setTimeout(tryToBecomeLeader, 1000);
-  }
-}
-
 function maintainLeadership() {
   if (!lock) return;
   setTimeout(async () => {
@@ -47,6 +36,17 @@ function maintainLeadership() {
   }, LOCK_TTL - 2000);
 }
 
+async function tryToBecomeLeader() {
+  try {
+    lock = await redlock.acquire([LOCK_KEY], LOCK_TTL);
+    await becomeLeader();
+    maintainLeadership();
+  } catch (err) {
+    loseLeadership("lock not acquired");
+    setTimeout(tryToBecomeLeader, 1000);
+  }
+}
+
 async function releaseLeadership() {
   if (lock) {
     await lock.release();
@@ -55,8 +55,8 @@ async function releaseLeadership() {
   }
 }
 
-async function initLeaderElection(onLeadershipChange) {
-  setLeadershipChangeCallback(onLeadershipChange);
+async function initElection(onChangePollSlot) {
+  setChangeCallback(onChangePollSlot);
   redis.on("error", (err) => {
     loseLeadership("Redis error");
     console.error(`[${port}] Erro Redis:`, err.message);
@@ -72,6 +72,6 @@ async function initLeaderElection(onLeadershipChange) {
 }
 
 module.exports = {
-  initLeaderElection,
+  initElection,
   releaseLeadership,
 };

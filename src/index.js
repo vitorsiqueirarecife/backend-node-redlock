@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const statusRoute = require("./routes/status");
 const { startPolling, onChangePollSlot } = require("./tasks/poll");
-const { initElection } = require("./lib/leader.service");
+const { initElection } = require("./lib/leader/leader.service");
 const { port } = require("./utils/port");
 
 const app = express();

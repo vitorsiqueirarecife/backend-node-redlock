@@ -1,5 +1,5 @@
 const Redis = require("ioredis");
-const { port } = require("../utils/port");
+const { port } = require("../../utils/port");
 
 const redis = new Redis(process.env.REDIS_URL);
 

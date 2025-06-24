@@ -1,4 +1,4 @@
-const { setLastPolled, isLeaderNow } = require("../lib/leader.state");
+const { setLastPolled, isLeaderNow } = require("../lib/leader/leader.state");
 const { port } = require("../utils/port");
 
 // STATE do poll

@@ -1,9 +1,9 @@
-const redlock = require("./redlock");
-const redis = require("./redis");
+const redlock = require("../redis/redlock");
+const redis = require("../redis/redis");
 
 const { setLeadership, setChangeCallback } = require("./leader.state");
 
-const { port } = require("../utils/port");
+const { port } = require("../../utils/port");
 
 // Handler change states
 

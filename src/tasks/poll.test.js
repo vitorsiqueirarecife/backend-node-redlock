@@ -21,6 +21,16 @@ describe("Polling logic", () => {
     jest.clearAllTimers();
   });
 
+  beforeAll(() => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
+    jest.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterAll(() => {
+    console.log.mockRestore();
+    console.warn.mockRestore();
+  });
+
   it("don't polling if not leader", () => {
     leaderState.isLeaderNow.mockReturnValue(false);
     poll.onChangePollSlot(false);

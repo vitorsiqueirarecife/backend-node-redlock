@@ -3,7 +3,7 @@ const redis = require("../redis/redis");
 
 const { setLeadership, setChangeCallback } = require("./leader.state");
 
-const { port } = require("../../utils/port");
+const { port, hostname } = require("../../utils/port");
 
 // Handler change states
 
@@ -14,12 +14,12 @@ let lock = null;
 
 async function becomeLeader() {
   setLeadership(true);
-  console.log(`[${port}] is now the leader!`);
+  console.log(`[${port} ${hostname}] is now the leader!`);
 }
 
 function loseLeadership(reason) {
   setLeadership(false);
-  console.warn(`[${port}] lost leadership: ${reason}`);
+  console.warn(`[${port} ${hostname}] lost leadership: ${reason}`);
 }
 
 function maintainLeadership() {
@@ -42,7 +42,7 @@ async function tryToBecomeLeader() {
     await becomeLeader();
     maintainLeadership();
   } catch (err) {
-    loseLeadership("lock not acquired");
+    loseLeadership(`[${port} ${hostname}] lock not acquired`);
     setTimeout(tryToBecomeLeader, 1000);
   }
 }
@@ -51,15 +51,15 @@ async function releaseLeadership() {
   if (lock) {
     await lock.release();
     lock = null;
-    loseLeadership("lock released explicitly");
+    loseLeadership(`[${port} ${hostname}] lock released explicitly`);
   }
 }
 
 async function initElection(onChangePollSlot) {
   setChangeCallback(onChangePollSlot);
   redis.on("error", (err) => {
-    loseLeadership("Redis error");
-    console.error(`[${port}] Erro Redis:`, err.message);
+    loseLeadership(`[${port} ${hostname}] Redis error`);
+    console.error(`[${port} ${hostname}] Erro Redis:`, err.message);
   });
   await tryToBecomeLeader();
 

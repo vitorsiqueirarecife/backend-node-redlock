@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: leader-election-challenge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: leader-election-challenge
+  template:
+    metadata:
+      labels:
+        app: leader-election-challenge
+    spec:
+      containers:
+        - name: leader-election-challenge
+          image: leader-election-challenge:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          env:
+            - name: POLL_INTERVAL
+              valueFrom:
+                secretKeyRef:
+                  name: leader-election-challenge-secret
+                  key: POLL_INTERVAL
+            - name: REDIS_LOCK_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: leader-election-challenge-secret
+                  key: REDIS_LOCK_KEY
+            - name: REDIS_LOCK_TTL
+              valueFrom:
+                secretKeyRef:
+                  name: leader-election-challenge-secret
+                  key: REDIS_LOCK_TTL
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: leader-election-challenge-secret
+                  key: REDIS_URL

@@ -1,5 +1,5 @@
 const { setLastPolled, isLeaderNow } = require("../lib/leader/leader.state");
-const { port } = require("../utils/port");
+const { port, hostname } = require("../utils/port");
 
 // STATE do poll
 let lastPollSlot = null;
@@ -23,7 +23,7 @@ const startPolling = () => {
       lastPollSlot = pollSlot;
       const pollTime = new Date().toISOString();
       setLastPolled(pollTime);
-      console.log(`[${port}] Polling ----> API at ${pollTime}`);
+      console.log(`[${port} ${hostname}] Polling ----> API at ${pollTime}`);
     }
   }, 250);
 };

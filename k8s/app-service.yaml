@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: leader-election-challenge
+spec:
+  type: LoadBalancer
+  selector:
+    app: leader-election-challenge
+  ports:
+    - port: 3000
+      targetPort: 3000

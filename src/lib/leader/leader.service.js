@@ -42,7 +42,7 @@ async function tryToBecomeLeader() {
     await becomeLeader();
     maintainLeadership();
   } catch (err) {
-    loseLeadership(`[${port} ${hostname}] lock not acquired`);
+    loseLeadership(`lock not acquired`);
     setTimeout(tryToBecomeLeader, 1000);
   }
 }
@@ -51,14 +51,14 @@ async function releaseLeadership() {
   if (lock) {
     await lock.release();
     lock = null;
-    loseLeadership(`[${port} ${hostname}] lock released explicitly`);
+    loseLeadership(`lock released explicitly`);
   }
 }
 
 async function initElection(onChangePollSlot) {
   setChangeCallback(onChangePollSlot);
   redis.on("error", (err) => {
-    loseLeadership(`[${port} ${hostname}] Redis error`);
+    loseLeadership(`Redis error`);
     console.error(`[${port} ${hostname}] Erro Redis:`, err.message);
   });
   await tryToBecomeLeader();

@@ -2,13 +2,14 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: leader-election-challenge-hpa
+  namespace: leader-election
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: leader-election-challenge
-  minReplicas: 1
-  maxReplicas: 2
+  minReplicas: 3
+  maxReplicas: 6
   metrics:
     - type: Resource
       resource:
